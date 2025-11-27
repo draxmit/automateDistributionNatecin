@@ -34,20 +34,24 @@ async function main() {
     return;
   }
 
-  // ---- Decode execPayload ----
-  const iface = new ethers.Interface([
-    "function dummy(address[] list, uint256 nextIndex)" // just for decoding
-  ]);
+  // ---- Step 2: decode execPayload ----
+  // payload = abi.encode(address[], uint256)
+  const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
-  const decoded = iface.decodeFunctionData("dummy", payload);
-
-  const list = decoded.list;
-  const nextIndex = decoded.nextIndex;
+  const [list, nextIndex] = abiCoder.decode(
+    ["address[]", "uint256"],
+    payload
+  );
 
   console.log("Ready vaults:", list);
   console.log("Next index:", Number(nextIndex));
 
-  // ---- Step 2: executeBatch() ----
+  if (list.length === 0) {
+    console.log("List is empty. Nothing to execute.");
+    return;
+  }
+
+  // ---- Step 3: executeBatch() ----
   const tx = await registry.executeBatch(list, nextIndex);
   console.log("Transaction sent:", tx.hash);
 

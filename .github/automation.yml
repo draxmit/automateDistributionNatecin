@@ -1,0 +1,28 @@
+name: Lisk Vault Automation
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # runs every 10 minutes
+  workflow_dispatch:          # allow manual run from GH UI
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Automation Script
+        run: node cron.js
+        env:
+          RPC_URL: ${{ secrets.RPC_URL }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          REGISTRY_ADDRESS: ${{ secrets.REGISTRY_ADDRESS }}

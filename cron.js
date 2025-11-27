@@ -35,16 +35,18 @@ async function main() {
   }
 
   // ---- Step 2: decode execPayload ----
-  // payload = abi.encode(address[], uint256)
   const abiCoder = ethers.AbiCoder.defaultAbiCoder();
-
-  const [list, nextIndex] = abiCoder.decode(
+  let [rawList, rawNextIndex] = abiCoder.decode(
     ["address[]", "uint256"],
     payload
   );
 
+  // Convert Result objects → plain JS
+  const list = Array.from(rawList);
+  const nextIndex = Number(rawNextIndex);
+
   console.log("Ready vaults:", list);
-  console.log("Next index:", Number(nextIndex));
+  console.log("Next index:", nextIndex);
 
   if (list.length === 0) {
     console.log("List is empty. Nothing to execute.");
